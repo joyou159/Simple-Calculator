@@ -52,7 +52,7 @@ class Ui_MainWindow(object):
         self.clearButton.setObjectName("clearButton")
         self.horizontalLayout.addWidget(self.clearButton)
         self.arrowButton = QtWidgets.QPushButton(
-            parent=self.widget, clicked=lambda: self.press_it("<<"))
+            parent=self.widget, clicked=lambda: self.remove_it())
         font = QtGui.QFont()
         font.setPointSize(26)
         self.arrowButton.setFont(font)
@@ -161,7 +161,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_5.setObjectName("horizontalLayout_5")
         self.plusMinusButton = QtWidgets.QPushButton(
-            parent=self.widget, clicked=lambda: self.press_it("+/-"))
+            parent=self.widget, clicked=lambda: self.plus_minus_it())
         font = QtGui.QFont()
         font.setPointSize(26)
         self.plusMinusButton.setFont(font)
@@ -175,14 +175,14 @@ class Ui_MainWindow(object):
         self.zeroButton.setObjectName("zeroButton")
         self.horizontalLayout_5.addWidget(self.zeroButton)
         self.decimalButton = QtWidgets.QPushButton(
-            parent=self.widget, clicked=lambda: self.press_it("."))
+            parent=self.widget, clicked=lambda: self.dot_it())
         font = QtGui.QFont()
         font.setPointSize(26)
         self.decimalButton.setFont(font)
         self.decimalButton.setObjectName("decimalButton")
         self.horizontalLayout_5.addWidget(self.decimalButton)
         self.equalButton = QtWidgets.QPushButton(
-            parent=self.widget, clicked=lambda: self.press_it("="))
+            parent=self.widget, clicked=lambda: self.math_it())
         font = QtGui.QFont()
         font.setPointSize(26)
         self.equalButton.setFont(font)
@@ -209,6 +209,58 @@ class Ui_MainWindow(object):
                 self.outputLabel.setText(f"{self.outputLabel.text()}{pressed}")
             else: 
                 self.outputLabel.setText(f"{pressed}")
+
+    # let's do some math!
+    def math_it(self):
+        screen = self.outputLabel.text() # grab what's on the screen 
+        try:
+            answer = eval(screen) # this evaluates a string with signs in between
+            self.outputLabel.setText(str(answer))
+        except: 
+            self.outputLabel.setText("ERROR")
+    # Remove character 
+    def remove_it(self):
+        screen = self.outputLabel.text() # grab what's on the screen 
+        self.outputLabel.setText(screen[:-1]) 
+
+    # change sign 
+    def plus_minus_it(self):
+        screen = self.outputLabel.text() # grab what's on the screen
+        flag = False # no change of sign  
+        for i in range(len(screen)-1,0,-1):
+            if screen[i] == "-":
+                screen = screen[:i] + "+" + screen[i+1:]
+                flag = True
+                break
+            elif screen[i] == "+":
+                screen = screen[:i] + "-" + screen[i+1:]
+                flag = True
+                break
+            else:
+                continue
+        if not flag:
+            screen = "-" + screen
+        
+        self.outputLabel.setText(screen)
+
+    # add a decimal 
+    def dot_it(self):
+        digits = ["1","2","3","4","5","6","7","8","9"]
+        operations = ["+","-","/","*"]
+        screen = self.outputLabel.text()
+        flag = True
+        for i in range(len(screen)-1,0,-1):
+            if screen[i] in digits:
+                continue
+            elif screen[i] in operations: # indication of new number 
+                break
+            else:
+                flag = False 
+                break
+        if flag:
+            self.outputLabel.setText(f"{screen}.")
+
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Calcuator"))
